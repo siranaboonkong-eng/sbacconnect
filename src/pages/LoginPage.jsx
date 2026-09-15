@@ -30,11 +30,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
-  /* กล่องบอกวิธีขอรหัสใหม่ — เปิดเองเมื่อล็อกอินไม่ผ่าน หรือกดปุ่ม "ลืมรหัสผ่าน?"
-     ของเดิมข้อความนี้เป็น toast ซึ่งหายไปเองใน 3 วินาที
-     คนที่กำลังจดว่าต้องไปตึกไหนชั้นไหนอ่านไม่ทัน แล้วไม่มีทางเรียกกลับมาดูซ้ำ
-     นอกจากกดปุ่มใหม่ให้มันเด้งอีกรอบ */
-  const [showHelp, setShowHelp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lang, setLang] = useState('TH');
   const passwordRef = useRef(null);
@@ -85,10 +80,8 @@ export default function LoginPage() {
     } else {
       setError(result.error);
       showToast(result.error, 'error');
-      /* ล็อกอินไม่ผ่านคือจังหวะเดียวที่คนอยากรู้ว่า "แล้วต้องไปเอารหัสใหม่ที่ไหน"
-         ของเดิมข้อความนี้ซ่อนอยู่หลังปุ่ม "ลืมรหัสผ่าน?" ที่ต้องรู้ก่อนว่าต้องกด
-         ตอนนี้ขึ้นเองพร้อมกับข้อความแจ้งเตือน ไม่ว่าจะเป็นบัญชีนักเรียนหรือของฝ่ายวิชาการ */
-      setShowHelp(true);
+      /* ไม่ต้องสั่งให้กล่องช่วยเหลือโผล่แล้ว — มันขึ้นถาวรอยู่ใต้ฟอร์มตลอดเวลา
+         คนที่ล็อกอินไม่ผ่านจึงเห็นทางเดินต่อไปโดยไม่ต้องกดอะไรเพิ่ม */
     }
   };
 
@@ -142,28 +135,31 @@ export default function LoginPage() {
     labelPass: lang === 'TH' ? 'รหัสประจำตัวนักเรียน' : 'Student Code',
     phPass: lang === 'TH' ? 'กรอกรหัสประจำตัว' : 'Enter your student code',
     remember: lang === 'TH' ? 'จดจำบัญชีผู้ใช้' : 'Remember me',
-    forgot: lang === 'TH' ? 'ลืมรหัสผ่าน?' : 'Forgot password?',
     btnSubmit: lang === 'TH' ? 'เข้าสู่ระบบ' : 'Sign In',
     btnLoading: lang === 'TH' ? 'กำลังตรวจสอบ...' : 'Authenticating...',
     secTitle: lang === 'TH' ? 'ระบบเชื่อมต่อปลอดภัย' : 'Secured Connection',
     secDesc: lang === 'TH' ? 'ข้อมูลถูกเข้ารหัสเพื่อความปลอดภัย' : 'Your data is encrypted for security',
     helpTitle: lang === 'TH' ? 'เข้าสู่ระบบไม่ได้ใช่ไหม' : 'Trouble signing in?',
-    /* ข้อความเดียวใช้กับทุกบทบาท — ฝ่ายทะเบียนเป็นจุดรับเรื่องจุดเดียวของทั้งวิทยาลัย
-       (ตามที่ผู้ดูแลระบบกำหนด) ไม่ว่าคนกดจะเป็นนักเรียน ครู ฝ่ายวิชาการ หรือร้านค้า
+    /* ระบบไม่มีฟังก์ชัน "ลืมรหัสผ่าน" อีกต่อไป — ไม่มีปุ่ม ไม่มีลิงก์ ไม่มีการตั้งรหัสใหม่เอง
+       เพราะรหัสผ่านอ้างอิงจากเลขบัตรประจำตัวประชาชน/รหัสประจำตัวนักเรียนโดยตรง
+       จึงไม่ใช่ความลับที่ "ลืมแล้วต้องรีเซ็ต" แต่เป็นเลขที่เจ้าตัวหาได้จากบัตรของตัวเอง
 
-       ห้ามเขียนเป็นขั้นตอนของนักเรียนโดยเฉพาะอีก — ของเดิมสั่งให้ "นำบัตรประจำตัวนักเรียน"
-       มาด้วย ครู/ฝ่ายวิชาการที่กดปุ่มนี้จึงถูกสั่งให้หยิบบัตรที่ตัวเองไม่มี
-       ข้อความนี้จึงพูดถึงแค่ "ไปที่ไหน" ซึ่งเป็นข้อมูลที่ใช้ได้กับทุกคนเหมือนกัน
+       บอกก่อนว่ารหัสผ่านคืออะไร แล้วค่อยบอกว่าถ้ายังไม่ได้ต้องไปหาใคร
+       เคสส่วนใหญ่จบที่บรรทัดแรกโดยไม่ต้องเดินไปไหน
 
-       หน้านี้ใช้ร่วมกันทุกบทบาท และ ณ จังหวะที่กดปุ่มนี้ยังไม่มีทางรู้ว่าคนกดเป็นใคร
-       — ยังไม่ได้ล็อกอิน หรือล็อกอินไม่ผ่าน จึงไม่มี role ให้เลือกข้อความอยู่ดี
+       ข้อความเดียวใช้กับทุกบทบาท — หน้านี้ใช้ร่วมกันทั้งนักเรียน ครู ฝ่ายวิชาการ
+       และร้านค้า และ ณ จังหวะที่อ่านข้อความนี้ยังไม่มีทางรู้ว่าคนอ่านเป็นใคร
+       (ยังไม่ได้ล็อกอิน หรือล็อกอินไม่ผ่าน) จึงไม่มี role ให้เลือกข้อความอยู่ดี
 
-       ห้ามใส่เวลาทำการหรือเบอร์ติดต่อลงในข้อความนี้ถ้ายังไม่ได้ยืนยันกับฝ่ายทะเบียน
-       ข้อความบนหน้าล็อกอินคือสิ่งที่คนเชื่อแล้วเดินไปตามนั้นจริง */
+       ห้ามใส่อาคาร ชั้น เวลาทำการ หรือเบอร์ติดต่อลงในข้อความนี้ถ้ายังไม่ได้ยืนยัน
+       กับฝ่ายวิชาการ — ข้อความบนหน้าล็อกอินคือสิ่งที่คนเชื่อแล้วเดินไปตามนั้นจริง
+       ของเดิมเคยระบุ "ฝ่ายทะเบียน อาคาร 1 ชั้น 1" ไว้ ซึ่งเป็นคนละแผนกกับที่ใช้ตอนนี้ */
+    helpPass: lang === 'TH'
+      ? 'รหัสผ่านของคุณคือเลขบัตรประจำตัวประชาชนหรือรหัสประจำตัวนักเรียน ระบบไม่เปิดให้ตั้งรหัสใหม่เอง'
+      : 'Your password is your national ID or student code. The system does not offer self-service password resets.',
     helpBody: lang === 'TH'
-      ? 'กรุณาติดต่อที่ฝ่ายทะเบียน ที่อาคาร 1 ชั้น 1 เพื่อขอรหัสผ่านใหม่'
-      : 'Please contact the Registrar Office, Building 1, 1st Floor, to request a new password.',
-    helpClose: lang === 'TH' ? 'ปิดข้อความนี้' : 'Dismiss',
+      ? 'หากยังเข้าสู่ระบบไม่ได้ กรุณาติดต่อฝ่ายวิชาการโดยตรง'
+      : 'If you still cannot sign in, please contact the Academic Affairs Office directly.',
   };
 
   return (
@@ -355,8 +351,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Options Bar */}
-            <div className="flex items-center justify-between px-1">
+            {/* Options Bar — เหลือแค่ "จดจำบัญชีผู้ใช้" อย่างเดียว
+                ปุ่ม "ลืมรหัสผ่าน?" ถูกถอดออกทั้งระบบ วิธีขอความช่วยเหลืออยู่ในกล่องถาวรใต้ฟอร์มแทน
+                จึงไม่ต้องใช้ justify-between ที่เคยดันของสองชิ้นไปคนละฝั่ง */}
+            <div className="flex items-center px-1">
               <label className="flex items-center gap-2 cursor-pointer select-none group">
                 <input
                   type="checkbox"
@@ -372,15 +370,6 @@ export default function LoginPage() {
                   {t.remember}
                 </span>
               </label>
-              <button 
-                type="button" 
-                onClick={() => setShowHelp((v) => !v)}
-                aria-expanded={showHelp}
-                aria-controls="login-help"
-                className="text-xs font-bold text-brand hover:underline transition-colors min-h-[44px] px-1 -mr-1 inline-flex items-center"
-              >
-                {t.forgot}
-              </button>
             </div>
 
             {/* Error Message */}
@@ -399,32 +388,24 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            {/* วิธีขอรหัสใหม่ — ค้างอยู่จนกว่าจะกดปิด อ่านทันแน่นอน */}
-            {showHelp && (
-              <motion.div
-                id="login-help"
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`text-xs rounded-xl px-4 py-3 border flex items-start gap-2.5 ${
-                  isDark
-                    ? 'bg-sbac-blue/10 border-sbac-blue/25 text-slate-200'
-                    : 'bg-sbac-blue-50 border-sbac-blue/20 text-ink-secondary'
-                }`}
-              >
-                <Info size={16} className="text-brand shrink-0 mt-0.5" aria-hidden="true" />
-                <div className="space-y-1.5 min-w-0">
-                  <p className="font-extrabold text-brand">{t.helpTitle}</p>
-                  <p className="font-semibold leading-relaxed">{t.helpBody}</p>
-                  <button
-                    type="button"
-                    onClick={() => setShowHelp(false)}
-                    className="text-[11px] font-bold text-brand hover:underline"
-                  >
-                    {t.helpClose}
-                  </button>
-                </div>
-              </motion.div>
-            )}
+            {/* วิธีขอความช่วยเหลือ — ขึ้นถาวร ไม่มีปุ่มเปิด ไม่มีปุ่มปิด
+                ของเดิมซ่อนอยู่หลังปุ่ม "ลืมรหัสผ่าน?" ที่ต้องรู้ก่อนว่าต้องกด
+                ตอนนี้เป็นข้อมูลนิ่ง ๆ ที่อ่านได้ตลอดโดยไม่ต้องล็อกอินไม่ผ่านก่อน */}
+            <div
+              id="login-help"
+              className={`text-xs rounded-xl px-4 py-3 border flex items-start gap-2.5 ${
+                isDark
+                  ? 'bg-sbac-blue/10 border-sbac-blue/25 text-slate-200'
+                  : 'bg-sbac-blue-50 border-sbac-blue/20 text-ink-secondary'
+              }`}
+            >
+              <Info size={16} className="text-brand shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="space-y-1.5 min-w-0">
+                <p className="font-extrabold text-brand">{t.helpTitle}</p>
+                <p className="font-semibold leading-relaxed">{t.helpPass}</p>
+                <p className="font-semibold leading-relaxed">{t.helpBody}</p>
+              </div>
+            </div>
 
             {/* Submit Button with shadow */}
             <motion.button
